@@ -65,6 +65,10 @@ class WunderHTTP
     define_method(name.to_sym) {|id| get("#{name}?list_id=#{id}") }
   end
 
+  def completed_tasks(id)
+    get("tasks?list_id=#{id}&completed=true")
+  end
+
   private
 
   def get(path, options = {})
@@ -140,6 +144,7 @@ backup.add_folders(wunder.folders)
 
 wunder.lists.each do |list|
   backup.add_tasks(wunder.tasks(list[:id]))
+  backup.add_tasks(wunder.completed_tasks(list[:id]))
   backup.add_reminders(wunder.reminders(list[:id]))
   backup.add_subtasks(wunder.subtasks(list[:id]))
   backup.add_notes(wunder.notes(list[:id]))
