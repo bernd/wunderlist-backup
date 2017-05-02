@@ -139,17 +139,29 @@ auth = WunderAuth.new(ENV).validate!
 wunder = WunderHTTP.new('https://a.wunderlist.com/api/v1/', auth)
 backup = WunderBackup.new(wunder.user_id)
 
+STDERR.puts "Initialized."
 backup.add_lists(wunder.lists)
 backup.add_folders(wunder.folders)
 
-wunder.lists.each do |list|
+STDERR.puts "Processing #{wunder.lists.length} lists..."
+
+wunder.lists.each_with_index do |list, index|
+  STDERR.puts "   ... (#{index + 1}/#{wunder.lists.length}) #{list[:title]} ..."
+  STDERR.puts "      ... tasks"
   backup.add_tasks(wunder.tasks(list[:id]))
+  STDERR.puts "      ... completed tasks"
   backup.add_tasks(wunder.completed_tasks(list[:id]))
+  STDERR.puts "      ... reminders"
   backup.add_reminders(wunder.reminders(list[:id]))
+  STDERR.puts "      ... subtasks"
   backup.add_subtasks(wunder.subtasks(list[:id]))
+  STDERR.puts "      ... notes"
   backup.add_notes(wunder.notes(list[:id]))
+  STDERR.puts "      ... task_positions"
   backup.add_task_positions(wunder.task_positions(list[:id]))
+  STDERR.puts "      ... subtask_positions"
   backup.add_subtask_positions(wunder.subtask_positions(list[:id]))
 end
 
 puts JSON.dump(backup.to_hash)
+
